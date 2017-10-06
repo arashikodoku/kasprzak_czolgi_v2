@@ -11,15 +11,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class GraCzolgi extends ApplicationAdapter {
-	SpriteBatch batch;
-
-    private Pocisk pocisk;
-
-
 	private SpriteBatch batch;
 	private Music music;
 	private OrthographicCamera camera;
 	private ShapeRenderer shapeRenderer;
+
+	private Pocisk pocisk;
 
 	@Override
 	public void create () {
@@ -30,7 +27,7 @@ public class GraCzolgi extends ApplicationAdapter {
 		music.play();
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		camera.setToOrtho(false, 1600, 800);
 
         stworzPocisk();
 	}
@@ -47,27 +44,26 @@ public class GraCzolgi extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		camera.update();
+		rysujZiemie();
 
 		batch.setProjectionMatrix(camera.combined);
-
-
-
 		batch.begin();
-
         batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
 		batch.end();
-
-		shapeRenderer = new ShapeRenderer();
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setColor(Color.BROWN);
-		shapeRenderer.rect(0, 0, 800, 200);
-		shapeRenderer.end();
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
 		pocisk.getTexture().dispose();
+	}
+
+	private void rysujZiemie() {
+		shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.setColor(Color.BROWN);
+		shapeRenderer.rect(0, 0, 1600, 200);
+		shapeRenderer.end();
 	}
 }
