@@ -24,9 +24,6 @@ public class Czolg extends Sprite {
 
     public void draw(Batch batch) {
         super.draw(batch);
-
-        //rotationMatrix.setToRotation(Vector3.X, 15);
-        //batch.setTransformMatrix(rotationMatrix);
         wiezyczka.draw(batch);
     }
 
