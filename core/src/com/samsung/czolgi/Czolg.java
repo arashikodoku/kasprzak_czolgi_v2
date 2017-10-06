@@ -16,7 +16,6 @@ public class Czolg extends Sprite {
 
         wiezyczka = new Sprite(GraCzolgi.wiezyczkaTex);
         wiezyczka.setScale(SCALE);
-        wiezyczka.setRotation(45);
     }
 
     @Override
@@ -31,6 +30,6 @@ public class Czolg extends Sprite {
     }
 
     public void obrocWiezyczke(float stopnie) {
-        wiezyczka.rotate(stopnie);
+        wiezyczka.setRotation((float) Math.toDegrees(stopnie));
     }
 }

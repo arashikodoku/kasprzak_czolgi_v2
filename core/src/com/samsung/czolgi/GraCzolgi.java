@@ -7,9 +7,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.Random;
 
 public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDetector.GestureListenerCallback {
 
@@ -26,6 +30,7 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
 
     private boolean pociskLeci;
 
+    private boolean gracz2Strzela;
     // zasoby
     static Texture czolgTex;
     static Texture wiezyczkaTex;
@@ -35,8 +40,24 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
     Czolg gracz2;
 
     private Czolg czolgZagrozony;
+    private Czolg czolgStrzelajacy;
 
-    private Vector2 trasaPocisku;
+    private Vector2 punktGraniczny;
+
+    private boolean wgore;
+
+    private BitmapFont font;
+    private BitmapFontCache wygranaTekst;
+    private BitmapFontCache przegranaTekst;
+
+    private enum Stan {
+        WIN, LOSE,
+        ONPROGRES
+    }
+
+    ;
+
+    private Stan aktualnyStan = Stan.ONPROGRES;
 
 
     @Override
@@ -55,6 +76,21 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
 
         stworzPocisk();
         stworzCzolgi();
+        ustawTeksst();
+
+
+    }
+
+    private void ustawTeksst() {
+        font = new BitmapFont(false);
+        font.getData().scale(10);
+        wygranaTekst = font.newFontCache();
+        wygranaTekst.setColor(Color.GREEN);
+        wygranaTekst.setText("YOU WIN", EKRAN_SZEROKOSC / 4, EKRAN_WYSOKOSC / 2);
+        przegranaTekst = font.newFontCache();
+        przegranaTekst.setColor(Color.RED);
+        przegranaTekst.setText("YOU LOSE", EKRAN_SZEROKOSC / 4, EKRAN_WYSOKOSC / 2);
+
     }
 
     private void stworzCzolgi() {
@@ -92,6 +128,22 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
         if (pociskLeci) {
             pocisk.draw(batch);
         }
+
+        if (aktualnyStan == Stan.WIN) {
+            wygranaTekst.draw(batch);
+        }
+
+
+        switch (aktualnyStan) {
+            case WIN:
+                wygranaTekst.draw(batch);
+                break;
+            case LOSE:
+                przegranaTekst.draw(batch);
+                break;
+        }
+
+
         batch.end();
 
         if (pociskLeci) {
@@ -104,12 +156,22 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
     private void sprawdzStanPocisku() {
         if (pociskLeci) {
             if (pocisk.czyTrafilWCzolg(czolgZagrozony)) {
+                if (gracz2Strzela) {
+                    aktualnyStan = Stan.LOSE;
+                } else {
+                    aktualnyStan = Stan.WIN;
+                }
                 //TODO pokaz texture wybuchu
             } else if (pocisk.czyPozaEkranem()) {
                 pociskLeci = false;
+                if (gracz2Strzela) {
+                    gracz2Strzela = false;
+                } else {
+                    strzelaGracz2();
+                }
             } else {
                 //TODO fix this
-                przesunPocisk(trasaPocisku.x/40, trasaPocisku.y/40);
+                przesunPocisk(punktGraniczny.x / 40, wgore ? punktGraniczny.y / 40 : -punktGraniczny.y / 40);
             }
         }
     }
@@ -122,17 +184,21 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
 
     @Override
     public void callback(double kat, int moc) {
-        System.out.println("Angle: " + kat);
-        System.out.println("Moc: " + moc);
-        wystrzelPocisk(kat, moc);
+        if (!gracz2Strzela) {
+            System.out.println("Angle: " + kat);
+            System.out.println("Moc: " + moc);
+            wystrzelPocisk(kat, moc, gracz1, gracz2);
+        }
     }
 
-    private void wystrzelPocisk(double kat, int moc) {
+    private void wystrzelPocisk(double kat, int moc, Czolg czolgStrzelajacy, Czolg czolgZagrozony) {
         float delta = EKRAN_SZEROKOSC * moc / 100;
-        trasaPocisku = new Vector2(delta * (float)Math.cos(kat), delta * (float)Math.sin(kat));
-        pocisk.ustawPozycje((float) kat, gracz1.getX() + gracz1.getWidth(), gracz2.getY() + gracz2.getHeight());
-        czolgZagrozony = gracz2;
+        czolgStrzelajacy.obrocWiezyczke((float) kat);
+        punktGraniczny = new Vector2(delta * (float) Math.cos(kat), delta * (float) Math.sin(kat));
+        pocisk.ustawPozycje((float) kat, czolgStrzelajacy.getX() + czolgStrzelajacy.getWidth(), czolgStrzelajacy.getY() + czolgStrzelajacy.getHeight());
+        this.czolgZagrozony = czolgZagrozony;
         pociskLeci = true;
+        wgore = true;
     }
 
     private void rysujZiemie() {
@@ -145,18 +211,21 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
     }
 
 
-    private void wystrzelPocisk(float kat, int x, int y) {
-        pocisk.ustawPozycje(kat, x, y);
-
-        pociskLeci = true;
-    }
-
-
     private void przesunPocisk(float x, float y) {
-
+        if (pocisk.getX() > punktGraniczny.x && pocisk.getY() > punktGraniczny.y) {
+            wgore = false;
+        }
         pocisk.ustawPozycje(0, pocisk.getX() + x, pocisk.getY() + y);
+
     }
 
+    private void strzelaGracz2() {
+        gracz2Strzela = true;
+        Random random = new Random();
+        pocisk.flip(true, false);
+        float katStrzalu = 90.f + random.nextFloat() * 90.f;
+        wystrzelPocisk(Math.toRadians(katStrzalu), random.nextInt(95) + 5, gracz2, gracz1);
+    }
 
 
 }
