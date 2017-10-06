@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
 
-public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDetector.GestureListenerCallback {
+public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.GestureListenerCallback {
 
     public static final int EKRAN_SZEROKOSC = 1600;
     public static final int EKRAN_WYSOKOSC = 800;
@@ -118,7 +118,7 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        DirectionGestureDetector gestureDetector = new DirectionGestureDetector(this);
+        WykrywaczGestow gestureDetector = new WykrywaczGestow(this);
         Gdx.input.setInputProcessor(gestureDetector);
 
 

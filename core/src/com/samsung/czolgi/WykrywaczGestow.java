@@ -2,7 +2,7 @@ package com.samsung.czolgi;
 
 import com.badlogic.gdx.input.GestureDetector;
 
-public class DirectionGestureDetector extends GestureDetector {
+public class WykrywaczGestow extends GestureDetector {
     private static float startX;
     private static float startY;
 
@@ -13,7 +13,7 @@ public class DirectionGestureDetector extends GestureDetector {
         void callback(double angle, int force);
     }
 
-    public DirectionGestureDetector(GestureListenerCallback gestureListenerCallback) {
+    public WykrywaczGestow(GestureListenerCallback gestureListenerCallback) {
         super(new DirectionGestureListener(gestureListenerCallback));
     }
 
