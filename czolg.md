@@ -7,7 +7,7 @@ Na potrzeby naszej gry uprościmy czołg do dwóch podstawowych elementów:
  * wieżyczki z lufą
 
 Nasz czołg będzie reprezentowany przez taką teksturę
-![czolg](czolgi/android/assets/tank.png "Czołg")
+![czolg](android/assets/tank.png "Czołg")
 zatem klasa `Czolg` dziedziczy po klasie `Sprite`.
 ```
 public class Czolg extends Sprite {
