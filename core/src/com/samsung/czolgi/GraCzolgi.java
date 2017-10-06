@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -32,9 +31,16 @@ public class GraCzolgi extends ApplicationAdapter {
     static Texture czolgTex;
 	static Texture wiezyczkaTex;
 
+	// Gracze
+	Czolg gracz1;
+	Czolg gracz2;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+
+		czolgTex = new Texture("tank.png");
+		wiezyczkaTex = new Texture("turret.png");
 
 		music = Gdx.audio.newMusic(Gdx.files.internal("XX.mp3"));
 		music.setLooping(true);
@@ -44,16 +50,23 @@ public class GraCzolgi extends ApplicationAdapter {
 		camera.setToOrtho(false, 1600, 800);
 
         stworzPocisk();
-
-        czolgTex = new Texture("tank.png");
-		wiezyczkaTex = new Texture("turret.png");
+		stworzCzolgi();
 
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
 	}
 
-    private void stworzPocisk() {
-        pociskTexture = new Texture("pocisk.png");
+	private void stworzCzolgi() {
+		gracz1 = new Czolg();
+		gracz1.setPosition(100, 100);
+
+		gracz2 = new Czolg();
+		gracz2.setPosition(1600 - 100, 100);
+		gracz2.flip(true, false);
+	}
+
+	private void stworzPocisk() {
+        Texture pociskTexture = new Texture("pocisk.png");
         pocisk = new Pocisk(pociskTexture);
     }
 
@@ -82,9 +95,9 @@ public class GraCzolgi extends ApplicationAdapter {
 			pocisk.y = pozycja.y;
 		}
 
+		gracz1.draw(batch);
+		gracz2.draw(batch);
 
-
-        new Czolg().draw(batch);
         wystrzelPocisk(45, 150, 150 );
         batch.end();
 

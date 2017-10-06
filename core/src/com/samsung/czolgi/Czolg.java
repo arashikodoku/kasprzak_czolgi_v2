@@ -13,14 +13,17 @@ public class Czolg extends Sprite {
     public Czolg() {
         super(GraCzolgi.czolgTex);
         setScale(SCALE);
-        setPosition(100, 100);
 
         wiezyczka = new Sprite(GraCzolgi.wiezyczkaTex);
         wiezyczka.setScale(SCALE);
-        wiezyczka.setPosition(100, 100);
         wiezyczka.setRotation(45);
     }
 
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        wiezyczka.setPosition(x, y);
+    }
 
     public void draw(Batch batch) {
         super.draw(batch);
