@@ -7,9 +7,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class GraCzolgi extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -17,7 +21,16 @@ public class GraCzolgi extends ApplicationAdapter {
 	private OrthographicCamera camera;
 	private ShapeRenderer shapeRenderer;
 
+    private World world;
+
 	private Pocisk pocisk;
+    private Texture pociskTexture;
+
+    private boolean pociskLeci;
+
+	// zasoby
+    static Texture czolgTex;
+	static Texture wiezyczkaTex;
 
 	@Override
 	public void create () {
@@ -31,16 +44,22 @@ public class GraCzolgi extends ApplicationAdapter {
 		camera.setToOrtho(false, 1600, 800);
 
         stworzPocisk();
+
+        czolgTex = new Texture("tank.png");
+		wiezyczkaTex = new Texture("turret.png");
+
+        Box2D.init();
+        world = new World(new Vector2(0, -10), true);
 	}
 
     private void stworzPocisk() {
-        Texture pociskTexture = new Texture("pocisk.png");
+        pociskTexture = new Texture("pocisk.png");
         pocisk = new Pocisk(pociskTexture);
-        pocisk.set(100, 100, Pocisk.WIDTH, Pocisk.HEIGHT);
     }
 
     @Override
 	public void render () {
+        stepWorld();
 		Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -62,12 +81,21 @@ public class GraCzolgi extends ApplicationAdapter {
 			pocisk.x = pozycja.x;
 			pocisk.y = pozycja.y;
 		}
+
+
+
+        new Czolg().draw(batch);
+        wystrzelPocisk(45, 150, 150 );
+        batch.end();
+
+        przesunPocisk(100, 10);
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
 		pocisk.getTexture().dispose();
+        world.dispose();
 	}
 
 	private void rysujZiemie() {
@@ -78,4 +106,42 @@ public class GraCzolgi extends ApplicationAdapter {
 		shapeRenderer.rect(0, 0, 1600, 200);
 		shapeRenderer.end();
 	}
+
+
+    private void wystrzelPocisk(float kat, int x, int y) {
+        pocisk.ustawPozycje(kat, x, y);
+        pocisk.draw(batch);
+    }
+
+    private void usunPocisk() {
+        pociskLeci = false;
+    }
+
+    private void przesunPocisk(int x, int y) {
+
+    }
+
+    private void przesunPocisk(float angle, float power) {
+
+    }
+
+
+    static final float STEP_TIME = 1f / 60f;
+    static final int VELOCITY_ITERATIONS = 6;
+    static final int POSITION_ITERATIONS = 2;
+
+    float accumulator = 0;
+
+    private void stepWorld() {
+        float delta = Gdx.graphics.getDeltaTime();
+
+        accumulator += Math.min(delta, 0.25f);
+
+        if (accumulator >= STEP_TIME) {
+            accumulator -= STEP_TIME;
+
+            world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        }
+    }
+
 }
