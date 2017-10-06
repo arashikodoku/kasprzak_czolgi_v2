@@ -74,7 +74,6 @@ public class GraCzolgi extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.end();
 
 		DirectionGestureDetector gestureDetector = new DirectionGestureDetector();
 		Gdx.input.setInputProcessor(gestureDetector);
