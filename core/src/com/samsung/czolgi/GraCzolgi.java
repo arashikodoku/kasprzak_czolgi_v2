@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
-public class GraCzolgi extends ApplicationAdapter {
+public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDetector.GestureListenerCallback {
 
     public static final int EKRAN_SZEROKOSC = 1600;
     public static final int EKRAN_WYSOKOSC = 800;
@@ -79,7 +79,7 @@ public class GraCzolgi extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        DirectionGestureDetector gestureDetector = new DirectionGestureDetector();
+        DirectionGestureDetector gestureDetector = new DirectionGestureDetector(this);
         Gdx.input.setInputProcessor(gestureDetector);
 
         if (Gdx.input.isTouched()) {
@@ -117,6 +117,11 @@ public class GraCzolgi extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         pocisk.getTexture().dispose();
+    }
+
+    @Override
+    public void callback(double angle, int force) {
+        // TODO
     }
 
     private void rysujZiemie() {

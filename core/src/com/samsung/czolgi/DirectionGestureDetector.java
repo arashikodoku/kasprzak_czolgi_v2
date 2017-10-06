@@ -9,13 +9,19 @@ public class DirectionGestureDetector extends GestureDetector {
     private static float stopX;
     private static float stopY;
 
-    public DirectionGestureDetector() {
-        super(new DirectionGestureListener());
+    interface GestureListenerCallback {
+        void callback(double angle, int force);
+    }
+
+    public DirectionGestureDetector(GestureListenerCallback gestureListenerCallback) {
+        super(new DirectionGestureListener(gestureListenerCallback));
     }
 
     private static class DirectionGestureListener extends GestureDetector.GestureAdapter {
-        public DirectionGestureListener() {
-            super();
+        GestureListenerCallback gestureListenerCallback;
+
+        public DirectionGestureListener(GestureListenerCallback gestureListenerCallback) {
+            this.gestureListenerCallback = gestureListenerCallback;
         }
 
         @Override
@@ -31,11 +37,13 @@ public class DirectionGestureDetector extends GestureDetector {
             stopX = x;
             stopY = y;
 
-            System.out.println("delta x: " + getDeltaX());
-            System.out.println("delta y: " + getDeltaY());
-            System.out.println("angle: " + getAngle());
-            System.out.println("abs: " + getAbs());
-            System.out.println("force: " + getForce());
+            gestureListenerCallback.callback(getAngle(), getForce());
+
+//            System.out.println("delta x: " + getDeltaX());
+//            System.out.println("delta y: " + getDeltaY());
+//            System.out.println("angle: " + getAngle());
+//            System.out.println("abs: " + getAbs());
+//            System.out.println("force: " + getForce());
 
             return super.panStop(x, y, pointer, button);
         }
