@@ -23,12 +23,6 @@ public class DirectionGestureDetector extends GestureDetector {
             startX = x;
             startY = y;
 
-//            System.out.println("touch down x: " + x);
-//            System.out.println("touch down y: " + y);
-//
-//            System.out.println("touch down pointer: " + pointer);
-//            System.out.println("touch down button: " + button);
-
             return super.panStop(x, y, pointer, button);
         }
 
@@ -39,15 +33,27 @@ public class DirectionGestureDetector extends GestureDetector {
 
             System.out.println("delta x: " + getDeltaX());
             System.out.println("delta y: " + getDeltaY());
-
-//            System.out.println("pan stop x: " + x);
-//            System.out.println("pan stop y: " + y);
-//
-//            System.out.println("pan stop pointer: " + pointer);
-//            System.out.println("pan stop button: " + button);
+            System.out.println("angle: " + getAngle());
+            System.out.println("abs: " + getAbs());
+            System.out.println("force: " + getForce());
 
             return super.panStop(x, y, pointer, button);
         }
+    }
+
+    public static int getForce() {
+        if (getAbs() > 1000)
+            return 100;
+        else
+            return (int) (getAbs() * 100 / 1000);
+    }
+
+    public static double getAngle() {
+        return Math.toDegrees(Math.atan(-getDeltaY() / getDeltaX()));
+    }
+
+    public static double getAbs() {
+        return Math.sqrt(getDeltaX() * getDeltaX() + getDeltaY() * getDeltaY());
     }
 
     public static float getDeltaX() {

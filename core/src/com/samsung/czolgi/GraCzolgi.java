@@ -68,21 +68,9 @@ public class GraCzolgi extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
-		batch.end();
 
 		DirectionGestureDetector gestureDetector = new DirectionGestureDetector();
 		Gdx.input.setInputProcessor(gestureDetector);
-
-		if (Gdx.input.isTouched()) {
-			Vector3 pozycja = new Vector3();
-			pozycja.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(pozycja);
-			pocisk.x = pozycja.x;
-			pocisk.y = pozycja.y;
-		}
-
-
 
         new Czolg().draw(batch);
         wystrzelPocisk(45, 150, 150 );
