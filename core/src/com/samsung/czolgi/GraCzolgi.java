@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 
 public class GraCzolgi extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -48,8 +49,19 @@ public class GraCzolgi extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-        batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
+		batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
 		batch.end();
+
+		DirectionGestureDetector gestureDetector = new DirectionGestureDetector();
+		Gdx.input.setInputProcessor(gestureDetector);
+
+		if (Gdx.input.isTouched()) {
+			Vector3 pozycja = new Vector3();
+			pozycja.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(pozycja);
+			pocisk.x = pozycja.x;
+			pocisk.y = pozycja.y;
+		}
 	}
 	
 	@Override
