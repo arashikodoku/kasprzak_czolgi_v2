@@ -21,6 +21,10 @@ public class GraCzolgi extends ApplicationAdapter {
 
     private boolean pociskLeci;
 
+	// zasoby
+    static Texture czolgTex;
+	static Texture wiezyczkaTex;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -33,6 +37,9 @@ public class GraCzolgi extends ApplicationAdapter {
 		camera.setToOrtho(false, 1600, 800);
 
         stworzPocisk();
+
+        czolgTex = new Texture("tank.png");
+		wiezyczkaTex = new Texture("turret.png");
 	}
 
     private void stworzPocisk() {
@@ -59,6 +66,9 @@ public class GraCzolgi extends ApplicationAdapter {
             batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
         }
 
+        batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
+
+        new Czolg().draw(batch);
 		batch.end();
 
         przesunPocisk(100, 10);
