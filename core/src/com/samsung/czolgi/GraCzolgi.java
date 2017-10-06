@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 
 public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDetector.GestureListenerCallback {
 
@@ -35,6 +35,9 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
     Czolg gracz2;
 
     private Czolg czolgZagrozony;
+
+    private Vector2 trasaPocisku;
+
 
     @Override
     public void create() {
@@ -82,20 +85,18 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
         DirectionGestureDetector gestureDetector = new DirectionGestureDetector(this);
         Gdx.input.setInputProcessor(gestureDetector);
 
-        if (Gdx.input.isTouched()) {
-            Vector3 pozycja = new Vector3();
-            pozycja.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(pozycja);
-        }
 
         gracz1.draw(batch);
         gracz2.draw(batch);
+
         if (pociskLeci) {
-            wystrzelPocisk(45, 150, 150);
+            pocisk.draw(batch);
         }
         batch.end();
 
-        sprawdzStanPocisku();
+        if (pociskLeci) {
+            sprawdzStanPocisku();
+        }
 
 
     }
@@ -108,7 +109,7 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
                 pociskLeci = false;
             } else {
                 //TODO fix this
-                przesunPocisk(0, 0);
+                przesunPocisk(trasaPocisku.x/40, trasaPocisku.y/40);
             }
         }
     }
@@ -120,8 +121,18 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
     }
 
     @Override
-    public void callback(double angle, int force) {
-        // TODO
+    public void callback(double kat, int moc) {
+        System.out.println("Angle: " + kat);
+        System.out.println("Moc: " + moc);
+        wystrzelPocisk(kat, moc);
+    }
+
+    private void wystrzelPocisk(double kat, int moc) {
+        float delta = EKRAN_SZEROKOSC * moc / 100;
+        trasaPocisku = new Vector2(delta * (float)Math.cos(kat), delta * (float)Math.sin(kat));
+        pocisk.ustawPozycje((float) kat, gracz1.getX() + gracz1.getWidth(), gracz2.getY() + gracz2.getHeight());
+        czolgZagrozony = gracz2;
+        pociskLeci = true;
     }
 
     private void rysujZiemie() {
@@ -136,18 +147,16 @@ public class GraCzolgi extends ApplicationAdapter implements DirectionGestureDet
 
     private void wystrzelPocisk(float kat, int x, int y) {
         pocisk.ustawPozycje(kat, x, y);
-        pocisk.draw(batch);
+
         pociskLeci = true;
     }
 
 
-    private void przesunPocisk(int x, int y) {
+    private void przesunPocisk(float x, float y) {
 
+        pocisk.ustawPozycje(0, pocisk.getX() + x, pocisk.getY() + y);
     }
 
-    private void przesunPocisk(float angle, float power) {
-
-    }
 
 
 }

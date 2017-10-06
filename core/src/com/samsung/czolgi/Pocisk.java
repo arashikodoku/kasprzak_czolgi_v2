@@ -2,7 +2,6 @@ package com.samsung.czolgi;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
 
 /**
  * Created by p.adamczyk on 10/6/17.
@@ -19,7 +18,7 @@ public class Pocisk extends Sprite {
         this.texture = texture;
     }
 
-    public void ustawPozycje(float kat, int x, int y) {
+    public void ustawPozycje(float kat, float x, float y) {
         setRotation(kat);
         setPosition(x, y);
     }

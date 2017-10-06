@@ -57,7 +57,7 @@ public class DirectionGestureDetector extends GestureDetector {
     }
 
     public static double getAngle() {
-        return Math.toDegrees(Math.atan(-getDeltaY() / getDeltaX()));
+        return Math.atan(-getDeltaY() / getDeltaX());
     }
 
     public static double getAbs() {
