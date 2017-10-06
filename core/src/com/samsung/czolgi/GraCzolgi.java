@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -22,6 +23,8 @@ public class GraCzolgi extends ApplicationAdapter {
 	private Pocisk pocisk;
 
     private World world;
+
+    private Texture pociskTexture;
 
 
     private boolean pociskLeci;
@@ -51,13 +54,13 @@ public class GraCzolgi extends ApplicationAdapter {
 	}
 
     private void stworzPocisk() {
-        Texture pociskTexture = new Texture("pocisk.png");
+        pociskTexture = new Texture("pocisk.png");
         pocisk = new Pocisk(pociskTexture);
-        pocisk.set(100, 100, Pocisk.WIDTH, Pocisk.HEIGHT);
     }
 
     @Override
 	public void render () {
+        stepWorld();
 		Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -67,16 +70,11 @@ public class GraCzolgi extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
-        wystrzelPocisk();
 
-        if(pociskLeci) {
-            batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
-        }
-
-        batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
 
         new Czolg().draw(batch);
-		batch.end();
+        wystrzelPocisk(45, 150, 150 );
+        batch.end();
 
         przesunPocisk(100, 10);
 	}
@@ -85,6 +83,7 @@ public class GraCzolgi extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		pocisk.getTexture().dispose();
+        world.dispose();
 	}
 
 	private void rysujZiemie() {
@@ -97,8 +96,9 @@ public class GraCzolgi extends ApplicationAdapter {
 	}
 
 
-    private void wystrzelPocisk() {
-        pociskLeci = true;
+    private void wystrzelPocisk(float kat, int x, int y) {
+        pocisk.ustawPozycje(kat, x, y);
+        pocisk.draw(batch);
     }
 
     private void usunPocisk() {
@@ -111,6 +111,25 @@ public class GraCzolgi extends ApplicationAdapter {
 
     private void przesunPocisk(float angle, float power) {
 
+    }
+
+
+    static final float STEP_TIME = 1f / 60f;
+    static final int VELOCITY_ITERATIONS = 6;
+    static final int POSITION_ITERATIONS = 2;
+
+    float accumulator = 0;
+
+    private void stepWorld() {
+        float delta = Gdx.graphics.getDeltaTime();
+
+        accumulator += Math.min(delta, 0.25f);
+
+        if (accumulator >= STEP_TIME) {
+            accumulator -= STEP_TIME;
+
+            world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        }
     }
 
 }
