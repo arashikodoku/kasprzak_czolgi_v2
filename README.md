@@ -8,6 +8,21 @@ Rozpocznij przez pobranie [aplikacji](https://libgdx.badlogicgames.com/download.
 
 W tej chwili nie będziemy zagłębiać się w szczegóły konfiguracji projektów na Androida, lecz opiszemy w skrócie strukturę projektu, którą otrzymacie zaraz po utworzeniu projektu.
 
+Do stworzenia projektu wykorzystujemy narzędzie dostarczone przez twórców biblioteki libgdx, które po uruchomieniu wygląda tak:
+
+![generowanie projektu](1generowanieprojektu.png)
+
+W narzedziu zaznaczamy wszystkie niezbędne parametry takie jak
+- nazwa,
+- nazwa pakietu,
+- nazwa głównej klasy w projekcie,
+- katalog docelowy,
+- ścieżkę do SDK Android,
+- platformy na które jest przeznaczona gra
+- dodatki
+
+
+
 
 # Struktura projektu
 
@@ -31,3 +46,35 @@ Są to:
 ## Czołg
 
 ## Pocisk
+
+
+Pocisk jest reprezentacja pocisku strzelanego przez czołg.
+Pocisk będzie ukazywany przez teksturę
+![czolg](android/assets/pocisk.png "Pocisk")
+
+
+zatem klasa `Pocisk` dziedziczy po klasie `Sprite`.
+```
+public class Czolg extends Sprite {
+
+}
+```
+
+Wewnątrz mamy metode, która sprawdza czy kula trafiła w czołg:
+```
+    public boolean czyTrafilWCzolg(Czolg czolg) {
+        return czolg.getBoundingRectangle().overlaps(getBoundingRectangle());
+    }
+
+
+```
+oraz czy pocisk wyleciał poza obszar naszej gry:
+
+```
+    public boolean czyPozaEkranem() {
+        return getX() > GraCzolgi.EKRAN_SZEROKOSC || getX() < 0 ||
+                getY() > GraCzolgi.EKRAN_WYSOKOSC || getY() < 0;
+    }
+
+```
+
