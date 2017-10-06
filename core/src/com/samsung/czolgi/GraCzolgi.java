@@ -18,6 +18,9 @@ public class GraCzolgi extends ApplicationAdapter {
 
 	private Pocisk pocisk;
 
+
+    private boolean pociskLeci;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -48,8 +51,17 @@ public class GraCzolgi extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-        batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
+
+        wystrzelPocisk();
+
+        if(pociskLeci) {
+
+            batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
+        }
+
 		batch.end();
+
+        przesunPocisk(100, 10);
 	}
 	
 	@Override
@@ -66,4 +78,19 @@ public class GraCzolgi extends ApplicationAdapter {
 		shapeRenderer.rect(0, 0, 1600, 200);
 		shapeRenderer.end();
 	}
+
+
+    private void wystrzelPocisk() {
+        pociskLeci = true;
+    }
+
+    private void usunPocisk() {
+        pociskLeci = false;
+    }
+
+    private void przesunPocisk(int x, int y) {
+        pocisk.setX(pocisk.x + x*Gdx.graphics.getDeltaTime());
+        pocisk.setY(pocisk.y + y * Gdx.graphics.getDeltaTime());
+    }
+
 }

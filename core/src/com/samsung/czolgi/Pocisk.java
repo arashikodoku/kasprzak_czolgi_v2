@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Rectangle;
  */
 
 public class Pocisk extends Rectangle {
-    public static final int WIDTH = 92;
-    public static final int HEIGHT = 92;
+    public static final int WIDTH = 16;
+    public static final int HEIGHT = 16;
 
     private Texture texture;
 
