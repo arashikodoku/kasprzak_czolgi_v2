@@ -27,4 +27,13 @@ public class Pocisk extends Sprite {
     public Texture getTexture() {
         return texture;
     }
+
+    public boolean czyTrafilWCzolg(Czolg czolg) {
+        return czolg.getBoundingRectangle().overlaps(getBoundingRectangle());
+    }
+
+    public boolean czyPozaEkranem() {
+        return getX() > GraCzolgi.EKRAN_SZEROKOSC || getX() < 0 ||
+                getY() > GraCzolgi.EKRAN_WYSOKOSC || getY() < 0;
+    }
 }
