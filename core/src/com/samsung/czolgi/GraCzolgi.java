@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class GraCzolgi extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -17,6 +20,8 @@ public class GraCzolgi extends ApplicationAdapter {
 	private ShapeRenderer shapeRenderer;
 
 	private Pocisk pocisk;
+
+    private World world;
 
 
     private boolean pociskLeci;
@@ -40,6 +45,9 @@ public class GraCzolgi extends ApplicationAdapter {
 
         czolgTex = new Texture("tank.png");
 		wiezyczkaTex = new Texture("turret.png");
+
+        Box2D.init();
+        world = new World(new Vector2(0, -10), true);
 	}
 
     private void stworzPocisk() {
@@ -62,7 +70,6 @@ public class GraCzolgi extends ApplicationAdapter {
         wystrzelPocisk();
 
         if(pociskLeci) {
-
             batch.draw(pocisk.getTexture(), pocisk.x, pocisk.y);
         }
 
@@ -99,8 +106,11 @@ public class GraCzolgi extends ApplicationAdapter {
     }
 
     private void przesunPocisk(int x, int y) {
-        pocisk.setX(pocisk.x + x*Gdx.graphics.getDeltaTime());
-        pocisk.setY(pocisk.y + y * Gdx.graphics.getDeltaTime());
+
+    }
+
+    private void przesunPocisk(float angle, float power) {
+
     }
 
 }
