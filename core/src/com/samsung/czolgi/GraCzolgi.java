@@ -21,7 +21,6 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     public static final int EKRAN_WYSOKOSC = 800;
 
     private SpriteBatch batch;
-    private Music music;
     private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer;
 
@@ -31,9 +30,6 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     private boolean pociskLeci;
 
     private boolean gracz2Strzela;
-    // zasoby
-    static Texture czolgTex;
-    static Texture wiezyczkaTex;
 
     // Gracze
     Czolg gracz1;
@@ -46,7 +42,6 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
 
     private boolean wgore;
 
-    private BitmapFont font;
     private BitmapFontCache wygranaTekst;
     private BitmapFontCache przegranaTekst;
 
@@ -55,19 +50,16 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
         ONPROGRES
     }
 
-    ;
-
     private Stan aktualnyStan = Stan.ONPROGRES;
 
 
     @Override
     public void create() {
+        Assets.initialize();
+
         batch = new SpriteBatch();
 
-        czolgTex = new Texture("tank.png");
-        wiezyczkaTex = new Texture("turret.png");
-
-        music = Gdx.audio.newMusic(Gdx.files.internal("XX.mp3"));
+        Music music = Assets.getMusicBg();
         music.setLooping(true);
         music.play();
 
@@ -82,8 +74,7 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     }
 
     private void ustawTeksst() {
-        font = new BitmapFont(false);
-        font.getData().scale(10);
+        BitmapFont font = Assets.getFont();
         wygranaTekst = font.newFontCache();
         wygranaTekst.setColor(Color.GREEN);
         wygranaTekst.setText("YOU WIN", EKRAN_SZEROKOSC / 4, EKRAN_WYSOKOSC / 2);
@@ -179,6 +170,7 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     @Override
     public void dispose() {
         batch.dispose();
+        Assets.dispose();
         pocisk.getTexture().dispose();
     }
 

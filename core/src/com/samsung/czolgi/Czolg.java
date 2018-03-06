@@ -11,10 +11,10 @@ public class Czolg extends Sprite {
     private final Sprite wiezyczka;
 
     public Czolg() {
-        super(GraCzolgi.czolgTex);
+        super(Assets.getCzolgTex());
         setScale(SCALE);
 
-        wiezyczka = new Sprite(GraCzolgi.wiezyczkaTex);
+        wiezyczka = new Sprite(Assets.getWiezyczkaTex());
         wiezyczka.setScale(SCALE);
     }
 
