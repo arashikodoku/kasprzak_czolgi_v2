@@ -10,22 +10,27 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.samsung.czolgi.fizyka.Symulator;
 
 import java.util.Random;
 
-public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.GestureListenerCallback {
+public class GraCzolgi extends ApplicationAdapter {
 
-    public static final int EKRAN_SZEROKOSC = 1600;
-    public static final int EKRAN_WYSOKOSC = 800;
+    public static final int EKRAN_SZEROKOSC = 800;
+    public static final int EKRAN_WYSOKOSC = 480;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
-    private ShapeRenderer shapeRenderer;
 
+    private final Symulator symulator = new Symulator();
+
+    private Celowanie celowanie;
+    private Trajektoria trajektoria;
 
     private Pocisk pocisk;
+
+    private Ziemia ziemia;
 
     private boolean pociskLeci;
 
@@ -38,10 +43,6 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     private Czolg czolgZagrozony;
     private Czolg czolgStrzelajacy;
 
-    private Vector2 punktGraniczny;
-
-    private boolean wgore;
-
     private BitmapFontCache wygranaTekst;
     private BitmapFontCache przegranaTekst;
 
@@ -52,10 +53,13 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
 
     private Stan aktualnyStan = Stan.ONPROGRES;
 
+    private final ZasadyGry zasadyGry = new ZasadyGry(this);
+
 
     @Override
     public void create() {
         Assets.initialize();
+        zasadyGry.nowaGra();
 
         batch = new SpriteBatch();
 
@@ -66,21 +70,23 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
         camera = new OrthographicCamera();
         camera.setToOrtho(false, EKRAN_SZEROKOSC, EKRAN_WYSOKOSC);
 
+        ziemia = new Ziemia();
         stworzPocisk();
         stworzCzolgi();
-        ustawTeksst();
+        przygotujTeksty();
 
-
+        celowanie = new Celowanie();
+        trajektoria = new Trajektoria(celowanie, gracz1);
     }
 
-    private void ustawTeksst() {
+    private void przygotujTeksty() {
         BitmapFont font = Assets.getFont();
         wygranaTekst = font.newFontCache();
-        wygranaTekst.setColor(Color.GREEN);
-        wygranaTekst.setText("YOU WIN", EKRAN_SZEROKOSC / 4, EKRAN_WYSOKOSC / 2);
+        wygranaTekst.setColor(new Color(0, 0, 0, 1));
+        wygranaTekst.setText("YOU WIN", Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 2);
         przegranaTekst = font.newFontCache();
         przegranaTekst.setColor(Color.RED);
-        przegranaTekst.setText("YOU LOSE", EKRAN_SZEROKOSC / 4, EKRAN_WYSOKOSC / 2);
+        przegranaTekst.setText("YOU LOSE", Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 2);
 
     }
 
@@ -89,13 +95,13 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
         gracz1.setPosition(100, 100);
 
         gracz2 = new Czolg();
-        gracz2.setPosition(1600 - 100, 100);
+        gracz2.setPosition(EKRAN_SZEROKOSC - 100, 100);
         gracz2.flip(true, false);
     }
 
     private void stworzPocisk() {
-        Texture pociskTexture = new Texture("pocisk.png");
-        pocisk = new Pocisk(pociskTexture);
+        pocisk = new Pocisk();
+        symulator.add(pocisk.cialo);
     }
 
     @Override
@@ -103,15 +109,13 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
         Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        symulator.symuluj();
         camera.update();
-        rysujZiemie();
+
+        ziemia.draw(camera);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-
-        WykrywaczGestow gestureDetector = new WykrywaczGestow(this);
-        Gdx.input.setInputProcessor(gestureDetector);
-
 
         gracz1.draw(batch);
         gracz2.draw(batch);
@@ -137,6 +141,9 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
 
         batch.end();
 
+        celowanie.draw(camera);
+        trajektoria.draw(camera);
+
         if (pociskLeci) {
             sprawdzStanPocisku();
         }
@@ -160,9 +167,6 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
                 } else {
                     strzelaGracz2();
                 }
-            } else {
-                //TODO fix this
-                przesunPocisk(punktGraniczny.x / 40, wgore ? punktGraniczny.y / 40 : -punktGraniczny.y / 40);
             }
         }
     }
@@ -171,44 +175,16 @@ public class GraCzolgi extends ApplicationAdapter implements WykrywaczGestow.Ges
     public void dispose() {
         batch.dispose();
         Assets.dispose();
-        pocisk.getTexture().dispose();
-    }
-
-    @Override
-    public void callback(double kat, int moc) {
-        if (!gracz2Strzela) {
-            System.out.println("Angle: " + kat);
-            System.out.println("Moc: " + moc);
-            wystrzelPocisk(kat, moc, gracz1, gracz2);
-        }
     }
 
     private void wystrzelPocisk(double kat, int moc, Czolg czolgStrzelajacy, Czolg czolgZagrozony) {
-        float delta = EKRAN_SZEROKOSC * moc / 100;
+        float delta = Gdx.graphics.getWidth() * moc / 100;
         czolgStrzelajacy.obrocWiezyczke((float) kat);
-        punktGraniczny = new Vector2(delta * (float) Math.cos(kat), delta * (float) Math.sin(kat));
-        pocisk.ustawPozycje((float) kat, czolgStrzelajacy.getX() + czolgStrzelajacy.getWidth(), czolgStrzelajacy.getY() + czolgStrzelajacy.getHeight());
+        Vector2 sila = new Vector2(delta * (float) Math.cos(kat), delta * (float) Math.sin(kat));
+        pocisk.cialo.setPozycja(czolgStrzelajacy.getPosition());
+        pocisk.cialo.setPredkosc(sila);
         this.czolgZagrozony = czolgZagrozony;
         pociskLeci = true;
-        wgore = true;
-    }
-
-    private void rysujZiemie() {
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.BROWN);
-        shapeRenderer.rect(0, 0, 1600, 200);
-        shapeRenderer.end();
-    }
-
-
-    private void przesunPocisk(float x, float y) {
-        if (pocisk.getX() > punktGraniczny.x && pocisk.getY() > punktGraniczny.y) {
-            wgore = false;
-        }
-        pocisk.ustawPozycje(0, pocisk.getX() + x, pocisk.getY() + y);
-
     }
 
     private void strzelaGracz2() {

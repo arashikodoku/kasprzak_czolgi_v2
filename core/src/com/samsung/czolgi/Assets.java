@@ -20,6 +20,7 @@ public class Assets {
     // zasoby
     private static final String TEX_CZOLG = "tank.png";
     private static final String TEX_WIEZYCZKA = "turret.png";
+    private static final String TEX_POCISK = "pocisk.png";
 
     private static final String MUSIC_BG = "XX.mp3";
 
@@ -32,6 +33,7 @@ public class Assets {
 
         assetManager.load(TEX_CZOLG, Texture.class);
         assetManager.load(TEX_WIEZYCZKA, Texture.class);
+        assetManager.load(TEX_POCISK, Texture.class);
         assetManager.load(MUSIC_BG, Music.class);
 
         FreetypeFontLoader.FreeTypeFontLoaderParameter params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -56,6 +58,10 @@ public class Assets {
 
     public static Texture getWiezyczkaTex() {
         return assetManager.get(TEX_WIEZYCZKA);
+    }
+
+    public static Texture getPociskTex() {
+        return assetManager.get(TEX_POCISK);
     }
 
     public static Music getMusicBg() {
