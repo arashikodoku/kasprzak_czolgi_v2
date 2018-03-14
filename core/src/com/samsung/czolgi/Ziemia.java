@@ -18,7 +18,10 @@ public class Ziemia implements Disposable {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.BROWN);
-        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), 200);
+        shapeRenderer.rect(0, 0, camera.viewportWidth, camera.viewportHeight,
+            Color.FIREBRICK, Color.FIREBRICK, Color.SKY, Color.SKY);
+        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), 200,
+            Color.BROWN, Color.BROWN, Color.GOLDENROD, Color.GOLDENROD);
         shapeRenderer.end();
     }
 

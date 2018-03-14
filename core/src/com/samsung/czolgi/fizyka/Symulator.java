@@ -2,24 +2,32 @@ package com.samsung.czolgi.fizyka;
 
 import com.badlogic.gdx.Gdx;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Prosty symulator fizyki.
  */
 public class Symulator {
 
-    private static final float GRAWITACJA = 9.81f; // [m/s2]
+    static final float GRAWITACJA = 9.81f; // [m/s2]
 
-    private final List<Cialo> ciala = new ArrayList<Cialo>();
+    final Cialo[] ciala = new Cialo[256];
 
-    public void add(Cialo cialo) {
-        ciala.add(cialo);
+    public void dodaj(Cialo cialo) {
+        for (int i = 0; i < 256; i++) {
+            if (ciala[i] == null) {
+                ciala[i] = cialo;
+                break;
+            }
+        }
     }
 
-    public void remove(Cialo cialo) {
-        ciala.remove(cialo);
+    public void usun(Cialo cialo) {
+        for (int i = 0; i < 256; i++) {
+            if (ciala[i] == cialo) {
+                ciala[i] = null;
+                break;
+            }
+        }
     }
 
     /**
@@ -37,7 +45,9 @@ public class Symulator {
      * @param deltaT delta time
      */
     public void symuluj(float deltaT) {
-        for (Cialo cialo : ciala) {
+        for (int i = 0; i < ciala.length; ++i) {
+            Cialo cialo = ciala[i];
+            if (cialo == null) continue;
             grawitacja(cialo, deltaT);
             przyspiesz(cialo, deltaT);
             przemiesc(cialo, deltaT);
@@ -45,25 +55,25 @@ public class Symulator {
     }
 
     /**
-     * s = V * dt
+     * S = s + V * Δt
      */
-    private void przemiesc(Cialo cialo, float deltaT) {
-        cialo.x += cialo.predkoscX * deltaT;
-        cialo.y += cialo.predkoscY * deltaT;
+    void przemiesc(Cialo cialo, float deltaT) {
+        cialo.x = cialo.x + cialo.predkoscX * deltaT;
+        cialo.y = cialo.y + cialo.predkoscY * deltaT;
     }
 
     /**
-     * v = a * dt
+     * V = v + a * Δt
      */
-    private void przyspiesz(Cialo cialo, float deltaT) {
+    void przyspiesz(Cialo cialo, float deltaT) {
         cialo.predkoscX += cialo.przyspX * deltaT;
         cialo.predkoscY += cialo.przyspY * deltaT;
     }
 
     /**
-     * v = g * dt
+     * V = v + g * Δt
      */
-    private void grawitacja(Cialo cialo, float deltaT) {
+    void grawitacja(Cialo cialo, float deltaT) {
         cialo.predkoscY += -GRAWITACJA * deltaT;
     }
 }

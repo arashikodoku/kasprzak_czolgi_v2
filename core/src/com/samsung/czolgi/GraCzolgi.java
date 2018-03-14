@@ -2,18 +2,17 @@ package com.samsung.czolgi;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.samsung.czolgi.fizyka.Symulator;
-
-import java.util.Random;
 
 public class GraCzolgi extends ApplicationAdapter {
 
@@ -23,37 +22,23 @@ public class GraCzolgi extends ApplicationAdapter {
     private SpriteBatch batch;
     private OrthographicCamera camera;
 
-    private final Symulator symulator = new Symulator();
+    private BitmapFontCache wygranaTekst;
+    private BitmapFontCache przegranaTekst;
+
+    final Symulator symulator = new Symulator();
 
     private Celowanie celowanie;
     private Trajektoria trajektoria;
 
-    private Pocisk pocisk;
+    Pocisk pocisk;
 
     private Ziemia ziemia;
 
-    private boolean pociskLeci;
+    private boolean wystrzelonyPocisk;
 
-    private boolean gracz2Strzela;
 
-    // Gracze
-    Czolg gracz1;
-    Czolg gracz2;
 
-    private Czolg czolgZagrozony;
-    private Czolg czolgStrzelajacy;
-
-    private BitmapFontCache wygranaTekst;
-    private BitmapFontCache przegranaTekst;
-
-    private enum Stan {
-        WIN, LOSE,
-        ONPROGRES
-    }
-
-    private Stan aktualnyStan = Stan.ONPROGRES;
-
-    private final ZasadyGry zasadyGry = new ZasadyGry(this);
+    final ZasadyGry zasadyGry = new ZasadyGry(this);
 
 
     @Override
@@ -71,12 +56,13 @@ public class GraCzolgi extends ApplicationAdapter {
         camera.setToOrtho(false, EKRAN_SZEROKOSC, EKRAN_WYSOKOSC);
 
         ziemia = new Ziemia();
-        stworzPocisk();
-        stworzCzolgi();
         przygotujTeksty();
 
+        pocisk = new Pocisk();
+        symulator.dodaj(pocisk.cialo);
+
         celowanie = new Celowanie();
-        trajektoria = new Trajektoria(celowanie, gracz1);
+        trajektoria = new Trajektoria(celowanie, zasadyGry.gracz);
     }
 
     private void przygotujTeksty() {
@@ -90,25 +76,8 @@ public class GraCzolgi extends ApplicationAdapter {
 
     }
 
-    private void stworzCzolgi() {
-        gracz1 = new Czolg();
-        gracz1.setPosition(100, 100);
-
-        gracz2 = new Czolg();
-        gracz2.setPosition(EKRAN_SZEROKOSC - 100, 100);
-        gracz2.flip(true, false);
-    }
-
-    private void stworzPocisk() {
-        pocisk = new Pocisk();
-        symulator.add(pocisk.cialo);
-    }
-
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         symulator.symuluj();
         camera.update();
 
@@ -117,56 +86,29 @@ public class GraCzolgi extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        gracz1.draw(batch);
-        gracz2.draw(batch);
-
-        if (pociskLeci) {
+        zasadyGry.draw(batch);
+        if (wystrzelonyPocisk) {
             pocisk.draw(batch);
         }
-
-        if (aktualnyStan == Stan.WIN) {
-            wygranaTekst.draw(batch);
-        }
-
-
-        switch (aktualnyStan) {
-            case WIN:
-                wygranaTekst.draw(batch);
-                break;
-            case LOSE:
-                przegranaTekst.draw(batch);
-                break;
-        }
-
-
         batch.end();
 
         celowanie.draw(camera);
         trajektoria.draw(camera);
 
-        if (pociskLeci) {
-            sprawdzStanPocisku();
-        }
-
-
+        sprawdzStanPocisku();
     }
 
     private void sprawdzStanPocisku() {
-        if (pociskLeci) {
-            if (pocisk.czyTrafilWCzolg(czolgZagrozony)) {
-                if (gracz2Strzela) {
-                    aktualnyStan = Stan.LOSE;
-                } else {
-                    aktualnyStan = Stan.WIN;
-                }
-                //TODO pokaz texture wybuchu
-            } else if (pocisk.czyPozaEkranem()) {
-                pociskLeci = false;
-                if (gracz2Strzela) {
-                    gracz2Strzela = false;
-                } else {
-                    strzelaGracz2();
-                }
+        if (wystrzelonyPocisk) {
+            Czolg c = null;
+            if ((c = zasadyGry.czyPociskTrafil(pocisk)) != null) {
+                wystrzelonyPocisk = false;
+                c.zniszcz();
+                MessageManager.getInstance().dispatchMessage(ZasadyGry.MSG_NASTEPNY_GRACZ);
+            }
+            if (pocisk.czyPozaEkranem()) {
+                wystrzelonyPocisk = false;
+                MessageManager.getInstance().dispatchMessage(ZasadyGry.MSG_NASTEPNY_GRACZ);
             }
         }
     }
@@ -177,23 +119,11 @@ public class GraCzolgi extends ApplicationAdapter {
         Assets.dispose();
     }
 
-    private void wystrzelPocisk(double kat, int moc, Czolg czolgStrzelajacy, Czolg czolgZagrozony) {
-        float delta = Gdx.graphics.getWidth() * moc / 100;
-        czolgStrzelajacy.obrocWiezyczke((float) kat);
-        Vector2 sila = new Vector2(delta * (float) Math.cos(kat), delta * (float) Math.sin(kat));
+    void wystrzelPocisk(Vector2 namiar, Czolg czolgStrzelajacy) {
         pocisk.cialo.setPozycja(czolgStrzelajacy.getPosition());
-        pocisk.cialo.setPredkosc(sila);
-        this.czolgZagrozony = czolgZagrozony;
-        pociskLeci = true;
+        pocisk.cialo.setPredkosc(namiar);
+        czolgStrzelajacy.obrocWiezyczke(namiar.nor().angle());
+        wystrzelonyPocisk = true;
     }
-
-    private void strzelaGracz2() {
-        gracz2Strzela = true;
-        Random random = new Random();
-        pocisk.flip(true, false);
-        float katStrzalu = 90.f + random.nextFloat() * 90.f;
-        wystrzelPocisk(Math.toRadians(katStrzalu), random.nextInt(95) + 5, gracz2, gracz1);
-    }
-
 
 }

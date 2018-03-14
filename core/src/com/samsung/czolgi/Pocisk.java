@@ -1,7 +1,6 @@
 package com.samsung.czolgi;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.samsung.czolgi.fizyka.Cialo;
@@ -9,11 +8,11 @@ import com.samsung.czolgi.fizyka.Cialo;
 
 public class Pocisk extends Sprite {
 
-    final Cialo cialo;
+    final Cialo cialo = new Cialo();
 
     public Pocisk() {
         super(Assets.getPociskTex());
-        this.cialo = new Cialo();
+        setScale(0.5f);
     }
 
     @Override
