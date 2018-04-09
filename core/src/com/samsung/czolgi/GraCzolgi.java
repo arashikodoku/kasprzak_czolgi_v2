@@ -1,129 +1,26 @@
 package com.samsung.czolgi;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.msg.MessageManager;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
-import com.samsung.czolgi.fizyka.Symulator;
+import com.badlogic.gdx.Game;
+import com.samsung.czolgi.screens.MainMenuScreen;
 
-public class GraCzolgi extends ApplicationAdapter {
+public class GraCzolgi extends Game {
 
     public static final int EKRAN_SZEROKOSC = 800;
     public static final int EKRAN_WYSOKOSC = 480;
 
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
+    private static GraCzolgi instance;
 
-    private BitmapFontCache wygranaTekst;
-    private BitmapFontCache przegranaTekst;
+    public GraCzolgi() {
+        instance = this;
+    }
 
-    final Symulator symulator = new Symulator();
-
-    private Celowanie celowanie;
-    private Trajektoria trajektoria;
-
-    Pocisk pocisk;
-
-    private Ziemia ziemia;
-
-    private boolean wystrzelonyPocisk;
-
-
-
-    final ZasadyGry zasadyGry = new ZasadyGry(this);
-
+    public static GraCzolgi getInstance() {
+        return instance;
+    }
 
     @Override
     public void create() {
         Assets.initialize();
-        zasadyGry.nowaGra();
-
-        batch = new SpriteBatch();
-
-        Music music = Assets.getMusicBg();
-        music.setLooping(true);
-        music.play();
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, EKRAN_SZEROKOSC, EKRAN_WYSOKOSC);
-
-        ziemia = new Ziemia();
-        przygotujTeksty();
-
-        pocisk = new Pocisk();
-        symulator.dodaj(pocisk.cialo);
-
-        celowanie = new Celowanie();
-        trajektoria = new Trajektoria(celowanie, zasadyGry.gracz);
+        setScreen(new MainMenuScreen());
     }
-
-    private void przygotujTeksty() {
-        BitmapFont font = Assets.getFont();
-        wygranaTekst = font.newFontCache();
-        wygranaTekst.setColor(new Color(0, 0, 0, 1));
-        wygranaTekst.setText("YOU WIN", Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 2);
-        przegranaTekst = font.newFontCache();
-        przegranaTekst.setColor(Color.RED);
-        przegranaTekst.setText("YOU LOSE", Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 2);
-
-    }
-
-    @Override
-    public void render() {
-        symulator.symuluj();
-        camera.update();
-
-        ziemia.draw(camera);
-
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-
-        zasadyGry.draw(batch);
-        if (wystrzelonyPocisk) {
-            pocisk.draw(batch);
-        }
-        batch.end();
-
-        celowanie.draw(camera);
-        trajektoria.draw(camera);
-
-        sprawdzStanPocisku();
-    }
-
-    private void sprawdzStanPocisku() {
-        if (wystrzelonyPocisk) {
-            Czolg c = null;
-            if ((c = zasadyGry.czyPociskTrafil(pocisk)) != null) {
-                wystrzelonyPocisk = false;
-                c.zniszcz();
-                MessageManager.getInstance().dispatchMessage(ZasadyGry.MSG_NASTEPNY_GRACZ);
-            }
-            if (pocisk.czyPozaEkranem()) {
-                wystrzelonyPocisk = false;
-                MessageManager.getInstance().dispatchMessage(ZasadyGry.MSG_NASTEPNY_GRACZ);
-            }
-        }
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        Assets.dispose();
-    }
-
-    void wystrzelPocisk(Vector2 namiar, Czolg czolgStrzelajacy) {
-        pocisk.cialo.setPozycja(czolgStrzelajacy.getPosition());
-        pocisk.cialo.setPredkosc(namiar);
-        czolgStrzelajacy.obrocWiezyczke(namiar.nor().angle());
-        wystrzelonyPocisk = true;
-    }
-
 }

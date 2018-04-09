@@ -18,7 +18,7 @@ import java.util.Random;
  *
  */
 
-public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
+public class ZasadyGry extends DefaultStateMachine<GameScreen, ZasadyGry.Stan> {
 
     private static final String TAG = "ZasadyGry";
 
@@ -30,7 +30,7 @@ public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
     final List<Czolg> czolgi = new ArrayList<Czolg>();
     Iterator<Czolg> kolejka;
 
-    public ZasadyGry(GraCzolgi graCzolgi) {
+    public ZasadyGry(GameScreen graCzolgi) {
         setOwner(graCzolgi);
         setInitialState(Stan.TURA_GRACZA);
         MessageManager.getInstance().addListeners(this, MSG_STRZAL);
@@ -66,10 +66,10 @@ public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
         return null;
     }
 
-    enum Stan implements State<GraCzolgi> {
+    enum Stan implements State<GameScreen> {
         TURA_GRACZA {
             @Override
-            public boolean onMessage(GraCzolgi entity, Telegram telegram) {
+            public boolean onMessage(GameScreen entity, Telegram telegram) {
                 if (telegram.message == MSG_STRZAL) {
                     entity.zasadyGry.czolgStrzelajacy = entity.zasadyGry.gracz;
                     entity.wystrzelPocisk((Vector2) telegram.extraInfo, entity.zasadyGry.gracz);
@@ -84,7 +84,7 @@ public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
 
         TURA_PRZECIWNIKA {
             @Override
-            public void enter(GraCzolgi entity) {
+            public void enter(GameScreen entity) {
                 super.enter(entity);
                 while (entity.zasadyGry.kolejka.hasNext()) {
                     entity.zasadyGry.czolgStrzelajacy = entity.zasadyGry.kolejka.next();
@@ -102,7 +102,7 @@ public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
             }
 
             @Override
-            public boolean onMessage(GraCzolgi entity, Telegram telegram) {
+            public boolean onMessage(GameScreen entity, Telegram telegram) {
                 if (telegram.message == MSG_NASTEPNY_GRACZ) {
                     entity.zasadyGry.changeState(TURA_PRZECIWNIKA);
                 }
@@ -115,22 +115,22 @@ public class ZasadyGry extends DefaultStateMachine<GraCzolgi, ZasadyGry.Stan> {
         };
 
         @Override
-        public void enter(GraCzolgi entity) {
+        public void enter(GameScreen entity) {
             Gdx.app.log(TAG, "enter " + name());
         }
 
         @Override
-        public void update(GraCzolgi entity) {
+        public void update(GameScreen entity) {
             Gdx.app.log(TAG, "update " + name());
         }
 
         @Override
-        public void exit(GraCzolgi entity) {
+        public void exit(GameScreen entity) {
             Gdx.app.log(TAG, "exit " + name());
         }
 
         @Override
-        public boolean onMessage(GraCzolgi entity, Telegram telegram) {
+        public boolean onMessage(GameScreen entity, Telegram telegram) {
             return true;
         }
     }
