@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.samsung.czolgi.fizyka.Symulator;
+import com.samsung.czolgi.internal.Assets;
+import com.samsung.czolgi.internal.Celowanie;
+import com.samsung.czolgi.internal.Trajektoria;
+import com.samsung.czolgi.internal.Ziemia;
 import com.samsung.czolgi.screens.AbstractScreen;
 
 /**

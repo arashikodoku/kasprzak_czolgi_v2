@@ -1,4 +1,4 @@
-package com.samsung.czolgi;
+package com.samsung.czolgi.internal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.samsung.czolgi.Czolg;
 import com.samsung.czolgi.fizyka.Cialo;
 import com.samsung.czolgi.fizyka.Symulator;
 
@@ -22,7 +23,7 @@ public class Trajektoria {
     private final Celowanie celowanie;
     private final Czolg czolg;
 
-    Trajektoria(Celowanie celowanie, Czolg czolg) {
+    public Trajektoria(Celowanie celowanie, Czolg czolg) {
         this.celowanie = celowanie;
         this.czolg = czolg;
     }

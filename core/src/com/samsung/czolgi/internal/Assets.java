@@ -1,4 +1,4 @@
-package com.samsung.czolgi;
+package com.samsung.czolgi.internal;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;

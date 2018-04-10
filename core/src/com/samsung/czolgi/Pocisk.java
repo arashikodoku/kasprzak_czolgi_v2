@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.samsung.czolgi.fizyka.Cialo;
+import com.samsung.czolgi.internal.Assets;
 
 
 public class Pocisk extends Sprite {

@@ -1,4 +1,4 @@
-package com.samsung.czolgi;
+package com.samsung.czolgi.internal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;

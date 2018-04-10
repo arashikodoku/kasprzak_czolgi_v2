@@ -1,4 +1,4 @@
-package com.samsung.czolgi;
+package com.samsung.czolgi.internal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.samsung.czolgi.ZasadyGry;
 
 /**
  *
@@ -14,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Celowanie extends InputAdapter {
 
-    final ShapeRenderer renderer = new ShapeRenderer();
+    private final ShapeRenderer renderer = new ShapeRenderer();
 
     private final Vector2 startTouch = new Vector2();
     private final Vector2 currentTouch = new Vector2();

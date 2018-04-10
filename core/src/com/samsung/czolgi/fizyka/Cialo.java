@@ -38,7 +38,4 @@ public class Cialo {
         this.y = pozycja.y;
     }
 
-    boolean koliduje(Cialo cialo) {
-        return false;
-    }
 }
