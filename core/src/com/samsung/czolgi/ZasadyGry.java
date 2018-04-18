@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.samsung.czolgi.internal.SI;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,16 +90,17 @@ public class ZasadyGry extends DefaultStateMachine<GameScreen, ZasadyGry.Stan> {
                 while (entity.zasadyGry.kolejka.hasNext()) {
                     entity.zasadyGry.czolgStrzelajacy = entity.zasadyGry.kolejka.next();
                     if (entity.zasadyGry.czolgStrzelajacy.czyZniszczony()) continue;
-                    Vector2 cel = pomysl(entity.zasadyGry.czolgStrzelajacy);
+                    Vector2 cel = pomysl(entity.zasadyGry.gracz, entity.zasadyGry.czolgStrzelajacy);
                     entity.wystrzelPocisk(cel, entity.zasadyGry.czolgStrzelajacy);
                     return;
                 }
                 entity.zasadyGry.changeState(TURA_GRACZA);
             }
 
-            private Vector2 pomysl(Czolg czolgStrzelajacy) {
+            private Vector2 pomysl(Czolg gracz, Czolg czolgStrzelajacy) {
                 Random r = new Random();
-                return new Vector2(r.nextFloat()-0.5f, r.nextFloat()).scl(r.nextInt(1000));
+                return SI.dajOptymalnaPredkoscPocisku(gracz, czolgStrzelajacy);
+                //return new Vector2(r.nextFloat()-0.5f, r.nextFloat()).scl(r.nextInt(1000));
             }
 
             @Override

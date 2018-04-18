@@ -8,7 +8,7 @@ import com.badlogic.gdx.Gdx;
  */
 public class Symulator {
 
-    static final float GRAWITACJA = 9.81f; // [m/s2]
+    public static final float GRAWITACJA = 9.81f; // [m/s2]
 
     final Cialo[] ciala = new Cialo[256];
 
