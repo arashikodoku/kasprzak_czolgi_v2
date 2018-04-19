@@ -64,6 +64,10 @@ public class ZasadyGry extends DefaultStateMachine<GameScreen, ZasadyGry.Stan> {
                 return c;
             }
         }
+        if (pocisk.czyTrafilWCzolg(gracz) && gracz != czolgStrzelajacy) {
+            return gracz;
+        }
+
         return null;
     }
 
